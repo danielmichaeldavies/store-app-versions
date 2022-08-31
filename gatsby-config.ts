@@ -1,5 +1,9 @@
 import type { GatsbyConfig } from "gatsby";
 
+require("dotenv").config({
+  path: `.env.development`,
+})
+
 const config: GatsbyConfig = {
   siteMetadata: {
     title: `appVersions`,
@@ -16,7 +20,8 @@ const config: GatsbyConfig = {
       "path": "./src/images/"
     },
     __key: "images"
-  }]
+  }],
+  pathPrefix: '/store-app-versions'
 };
 
 export default config;
