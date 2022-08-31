@@ -70,21 +70,71 @@ const IndexPage = () => {
     } catch (error) {
       console.error(error)
     }
-  }, [])
+  }, [keyId, issuerId, apiKey, setAppsData])
 
   return (
     <main>
       <Label>
         Key ID
-        <input type="text" onChange={(event) => setKeyId(event.target.value)} />
+        <input
+          type="text"
+          onFocus={() => {
+            if (keyId) return;
+
+            const storedKeyID = localStorage.getItem('KeyID');
+
+            if (storedKeyID) setKeyId(storedKeyID);
+          }}
+          onChange={(event) => {
+            const { value } = event.target;
+
+            localStorage.setItem('KeyID', value);
+
+            setKeyId(value);
+          }}
+          value={keyId}
+        />
       </Label>
       <Label>
         Issuer ID
-        <input type="text" onChange={(event) => setIssuerId(event.target.value)} />
+        <input
+          type="text"
+          onFocus={() => {
+            if (issuerId) return;
+
+            const storedIssuerID = localStorage.getItem('IssuerID');
+
+            if (storedIssuerID) setIssuerId(storedIssuerID);
+          }}
+          onChange={(event) => {
+            const { value } = event.target;
+
+            localStorage.setItem('IssuerID', value);
+
+            setIssuerId(value);
+          }}
+          value={issuerId}
+          />
       </Label>
       <Label>
         API Key
-        <input type="text" onChange={(event) => setApiKey(event.target.value)} />
+        <textarea
+          onFocus={() => {
+            if (apiKey) return;
+
+            const storedApiKey = localStorage.getItem('APIKey');
+
+            if (storedApiKey) setApiKey(storedApiKey);
+          }}
+          onChange={(event) => {
+            const { value } = event.target;
+
+            localStorage.setItem('APIKey', value);
+
+            setApiKey(value)
+          }}
+          value={apiKey}
+        />
       </Label>
 
       <button onClick={handleFetchAppsData}>Fetch Apps Data</button>
