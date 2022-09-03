@@ -1,7 +1,7 @@
-import * as React from "react"
-import type { HeadFC } from "gatsby"
+import React from 'react';
+import type { HeadFC } from 'gatsby';
 
-import * as jose from 'jose'
+import * as jose from 'jose';
 
 type AppData = {
   name: string;
@@ -31,13 +31,12 @@ const IndexPage = () => {
   const [keyId, setKeyId] = React.useState<string>('');
   const [issuerId, setIssuerId] = React.useState<string>('');
   const [apiKey, setApiKey] = React.useState<string>('');
-
+  const [errorText, setErrorText] = React.useState<string>('');
 
   const handleFetchAppsData = React.useCallback(async () => {
-    console.log(keyId, issuerId, apiKey)
     if (!keyId || !issuerId || !apiKey) return;
 
-    const privateKey = await jose.importPKCS8(apiKey, 'ES256')
+    const privateKey = await jose.importPKCS8(apiKey, 'ES256');
 
     // Create JWT
     const jwt = await new jose.SignJWT({})
@@ -48,29 +47,35 @@ const IndexPage = () => {
       .setAudience('appstoreconnect-v1')
       .sign(privateKey);
 
-      console.log(jwt)
-
     try {
-      const response = await fetch('https://api.appstoreconnect.apple.com/v1/apps', {
-        credentials: 'include',
+      const response = await fetch('http://localhost:3000', {
         headers: {
-          'Authorization': `Bearer ${jwt}`,
-        }
+          Authorization: `Bearer ${jwt}`,
+        },
       });
 
-      console.log(response)
+      if (!response.ok) {
+        console.error(response);
 
-      if (!response.ok) return;
+        setErrorText(`The response code was ${response.status}. Full error logged to console.`);
+
+        return;
+      }
 
       const { data } = await response.json() as AppStoreConnectResponse;
+
+      debugger;
+
       const nameData = data.map((app) => ({ name: app.attributes.name }));
 
-      setAppsData(nameData)
-
+      setAppsData(nameData);
     } catch (error) {
-      console.error(error)
+      console.error(error);
+
+      const message = (error as Error)?.message ?? 'unknown';
+      setErrorText(`Error: ${message}. Full error logged to console.`);
     }
-  }, [keyId, issuerId, apiKey, setAppsData])
+  }, [keyId, issuerId, apiKey, setAppsData]);
 
   return (
     <main>
@@ -114,7 +119,7 @@ const IndexPage = () => {
             setIssuerId(value);
           }}
           value={issuerId}
-          />
+        />
       </Label>
       <Label>
         API Key
@@ -131,13 +136,15 @@ const IndexPage = () => {
 
             localStorage.setItem('APIKey', value);
 
-            setApiKey(value)
+            setApiKey(value);
           }}
           value={apiKey}
         />
       </Label>
 
-      <button onClick={handleFetchAppsData}>Fetch Apps Data</button>
+      <button type="button" onClick={handleFetchAppsData}>Fetch Apps Data</button>
+
+      {errorText && <h3>{errorText}</h3>}
 
       <table>
         <thead>
@@ -149,16 +156,16 @@ const IndexPage = () => {
 
         <tbody>
           {appsData.map((appData) => (
-            <tr>
+            <tr key={appData.name}>
               <td>{appData.name}</td>
             </tr>
           ))}
         </tbody>
       </table>
     </main>
-  )
-}
+  );
+};
 
-export default IndexPage
+export default IndexPage;
 
-export const Head: HeadFC = () => <title>Home Page</title>
+export const Head: HeadFC = () => <title>Home Page</title>;
