@@ -20,11 +20,32 @@
         "@typescript-eslint"
     ],
     "rules": {
-        // note you must disable the base rule as it can report incorrect errors
+        // NOTE: The following base ruls are disabled in favour of the TS-ESlint versions
         "no-use-before-define": "off",
         "@typescript-eslint/no-use-before-define": ["error"],
+        "no-unused-vars": "off",
+        "@typescript-eslint/no-unused-vars": "error",
+
+        // Preferential rule overrides
         "react/function-component-definition": [2, { "namedComponents": "arrow-function", "unnamedComponents": "arrow-function"}],
         "react/jsx-filename-extension": [2, { "extensions": [".js", ".jsx", ".ts", ".tsx"] }],
-        "jsx-a11y/label-has-associated-control": ["off"]
+        "jsx-a11y/label-has-associated-control": ["off"],
+        "import/extensions": [
+            "error",
+            "ignorePackages",
+            {
+              "js": "never",
+              "jsx": "never",
+              "ts": "never",
+              "tsx": "never"
+            }
+        ]
+    },
+    "settings": {
+        "import/resolver": {
+            "node": {
+                "extensions": [".js", ".jsx", ".ts", ".tsx"]
+            }
+        }
     }
 }
